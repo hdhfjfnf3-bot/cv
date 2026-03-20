@@ -5,6 +5,7 @@ import {
   useTransform,
   useSpring,
   useInView,
+  useDragControls,
 } from "framer-motion";
 
 /* ══════════════════════════════════════════════════
@@ -18,6 +19,116 @@ function useIsMobile() {
     return () => window.removeEventListener("resize", fn);
   }, []);
   return mobile;
+}
+
+/* ══════════════════════════════════════════════════
+   FLOATING PHOTO
+══════════════════════════════════════════════════ */
+function FloatingPhoto() {
+  const isMobile = useIsMobile();
+  const size = isMobile ? 90 : 115;
+  const [dragging, setDragging] = useState(false);
+  const [hint, setHint] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setHint(false), 3500);
+    return () => clearTimeout(t);
+  }, []);
+
+  const vw = () => window.innerWidth;
+  const vh = () => window.innerHeight;
+
+  const path = () => {
+    const w = vw(); const h = vh(); const s = size;
+    return {
+      x: [
+        w * 0.72, w * 0.05, w * 0.45, w * 0.78,
+        w * 0.03, w * 0.55, w * 0.80, w * 0.72,
+      ].map(v => Math.max(4, Math.min(v, w - s - 4))),
+      y: [
+        h * 0.28, h * 0.55, h * 0.75, h * 0.80,
+        h * 0.18, h * 0.42, h * 0.62, h * 0.28,
+      ].map(v => Math.max(64, Math.min(v, h - s - 12))),
+    };
+  };
+
+  const p = path();
+
+  return (
+    <motion.div
+      drag
+      dragMomentum={false}
+      dragElastic={0.15}
+      onDragStart={() => { setDragging(true); setHint(false); }}
+      onDragEnd={() => setDragging(false)}
+      animate={dragging ? {} : { x: p.x, y: p.y }}
+      transition={dragging ? {} : {
+        duration: 44,
+        repeat: Infinity,
+        ease: "easeInOut",
+        times: [0, 0.14, 0.28, 0.42, 0.56, 0.70, 0.85, 1],
+      }}
+      style={{
+        position: "fixed",
+        width: size,
+        height: size,
+        zIndex: 55,
+        cursor: dragging ? "grabbing" : "grab",
+        touchAction: "none",
+        userSelect: "none",
+      }}
+      whileDrag={{ scale: 1.08 }}
+    >
+      <div style={{
+        width: size, height: size, borderRadius: "50%", overflow: "hidden",
+        border: "2.5px solid rgba(232,201,109,0.7)",
+        boxShadow: dragging
+          ? "0 0 28px 6px rgba(232,201,109,0.55), 0 0 60px rgba(124,58,237,0.4)"
+          : "0 0 18px 4px rgba(124,58,237,0.5), 0 4px 24px rgba(0,0,0,0.5)",
+        background: "#1a0f2e",
+        transition: "box-shadow 0.3s",
+      }}>
+        <img
+          src="/profile.png"
+          alt="Profile"
+          draggable={false}
+          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+        />
+      </div>
+      {hint && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: "absolute",
+            bottom: -26,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(232,201,109,0.15)",
+            border: "1px solid rgba(232,201,109,0.4)",
+            borderRadius: 20,
+            padding: "2px 10px",
+            fontSize: 10,
+            color: "#e8c96d",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+          }}
+        >
+          drag me ✦
+        </motion.div>
+      )}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        style={{
+          position: "absolute", inset: -6, borderRadius: "50%",
+          border: "1.5px dashed rgba(232,201,109,0.3)",
+          pointerEvents: "none",
+        }}
+      />
+    </motion.div>
+  );
 }
 
 /* ══════════════════════════════════════════════════
@@ -532,6 +643,7 @@ export default function App() {
       <div className="grid-overlay" />
       <div className="noise-overlay" />
       <Particles />
+      <FloatingPhoto />
 
       {/* ══ NAV ════════════════════════════════ */}
       <motion.nav style={{
