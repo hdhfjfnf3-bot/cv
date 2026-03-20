@@ -6,6 +6,7 @@ import {
   useSpring,
   useInView,
   useDragControls,
+  useAnimate,
 } from "framer-motion";
 
 /* ══════════════════════════════════════════════════
@@ -27,111 +28,128 @@ function useIsMobile() {
 function FloatingPhoto() {
   const isMobile = useIsMobile();
   const size = isMobile ? 88 : 110;
-  const [dragging, setDragging] = useState(false);
-  const [hint, setHint] = useState(true);
-  const selfRef = useRef<HTMLDivElement>(null);
+  const [scope, animate] = useAnimate();
   const draggingRef = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const [hint, setHint] = useState(false);
+  const heroInViewRef = useRef(true);
+  const busyRef = useRef(false);
 
-  const initPos = () => ({
-    x: window.innerWidth * (isMobile ? 0.68 : 0.82) - size / 2,
-    y: Math.max(70, window.innerHeight * 0.15),
-  });
-
-  const [pos, setPos] = useState(initPos);
-
-  useEffect(() => {
-    const t = setTimeout(() => setHint(false), 3000);
-    return () => clearTimeout(t);
-  }, []);
+  const getHeroCenter = () => {
+    const el = document.getElementById("hero-photo-anchor");
+    if (!el) return { x: window.innerWidth * 0.5 - size / 2, y: window.innerHeight * 0.4 - size / 2 };
+    const r = el.getBoundingClientRect();
+    return {
+      x: Math.round(r.left + r.width / 2 - size / 2),
+      y: Math.round(r.top + r.height / 2 - size / 2),
+    };
+  };
 
   const findEmptySpot = () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const s = size;
-    const NAV_H = 60;
+    const NAV_H = 62;
     const COLS = isMobile ? 4 : 7;
     const ROWS = 5;
     const PAD = 8;
-
     let bestScore = Infinity;
     let bestX = w * 0.8;
     let bestY = h * 0.5;
+    const el = scope.current as HTMLElement | null;
 
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const cx = PAD + col * (w - 2 * PAD - s) / Math.max(COLS - 1, 1) + s / 2;
         const cy = NAV_H + PAD + row * (h - NAV_H - 2 * PAD - s) / Math.max(ROWS - 1, 1) + s / 2;
-
         const probes: [number, number][] = [
           [cx, cy], [cx - s * 0.35, cy - s * 0.35],
           [cx + s * 0.35, cy - s * 0.35], [cx - s * 0.35, cy + s * 0.35],
           [cx + s * 0.35, cy + s * 0.35],
         ];
-
         let score = 0;
         for (const [px, py] of probes) {
           if (px < 0 || py < 0 || px > w || py > h) { score += 20; continue; }
-          const els = document.elementsFromPoint(px, py);
-          for (const el of els) {
-            if (el === selfRef.current || selfRef.current?.contains(el)) continue;
-            const tag = el.tagName;
-            const pos2 = getComputedStyle(el).position;
-            if (tag === "BODY" || tag === "HTML" || pos2 === "fixed") continue;
+          for (const e of document.elementsFromPoint(px, py)) {
+            if (el && (e === el || el.contains(e))) continue;
+            const tag = e.tagName;
+            if (tag === "BODY" || tag === "HTML") continue;
+            if (getComputedStyle(e).position === "fixed") continue;
             score += 1;
           }
         }
-
-        if (score < bestScore) {
-          bestScore = score;
-          bestX = cx - s / 2;
-          bestY = cy - s / 2;
-        }
+        if (score < bestScore) { bestScore = score; bestX = cx - s / 2; bestY = cy - s / 2; }
       }
     }
-
     return {
       x: Math.max(PAD, Math.min(bestX, w - s - PAD)),
       y: Math.max(NAV_H, Math.min(bestY, h - s - PAD)),
     };
   };
 
+  const runEmerge = async () => {
+    if (draggingRef.current || busyRef.current) return;
+    busyRef.current = true;
+    const hc = getHeroCenter();
+    await animate(scope.current, { x: hc.x, y: hc.y, scale: 0, opacity: 0 }, { duration: 0 });
+    await animate(scope.current, { scale: 1, opacity: 1 }, { duration: 0.45, ease: [0.22, 1, 0.36, 1] });
+    setHint(true);
+    setTimeout(() => setHint(false), 3000);
+    const spot = findEmptySpot();
+    await animate(scope.current, { x: spot.x, y: spot.y }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
+    busyRef.current = false;
+  };
+
+  const runReturn = async () => {
+    if (draggingRef.current || busyRef.current) return;
+    busyRef.current = true;
+    setHint(false);
+    const hc = getHeroCenter();
+    await animate(scope.current, { x: hc.x, y: hc.y }, { duration: 0.6, ease: [0.22, 1, 0.36, 1] });
+    await animate(scope.current, { scale: 0, opacity: 0 }, { duration: 0.3, ease: "easeIn" });
+    busyRef.current = false;
+  };
+
   useEffect(() => {
-    const move = () => {
-      if (draggingRef.current) return;
-      const spot = findEmptySpot();
-      setPos(spot);
-    };
+    const anchor = document.getElementById("hero-photo-anchor");
+    if (!anchor) return;
+    const hc = getHeroCenter();
+    animate(scope.current, { x: hc.x, y: hc.y, scale: 0, opacity: 0 }, { duration: 0 });
 
-    move();
+    const obs = new IntersectionObserver(([entry]) => {
+      const inView = entry.isIntersecting;
+      if (inView === heroInViewRef.current) return;
+      heroInViewRef.current = inView;
+      if (inView) { runReturn(); } else { runEmerge(); }
+    }, { threshold: 0.15 });
+    obs.observe(anchor);
 
-    let timer: ReturnType<typeof setTimeout>;
+    let scrollTimer: ReturnType<typeof setTimeout>;
     const onScroll = () => {
-      clearTimeout(timer);
-      timer = setTimeout(move, 350);
+      if (heroInViewRef.current || draggingRef.current || busyRef.current) return;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(async () => {
+        const spot = findEmptySpot();
+        await animate(scope.current, { x: spot.x, y: spot.y }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
+      }, 400);
     };
-
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", move);
+
     return () => {
+      obs.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", move);
-      clearTimeout(timer);
+      clearTimeout(scrollTimer);
     };
-  }, [isMobile, size]);
+  }, [isMobile]);
 
   return (
     <motion.div
-      ref={selfRef as React.RefObject<HTMLDivElement>}
+      ref={scope}
       drag
       dragMomentum={false}
       dragElastic={0.12}
       onDragStart={() => { draggingRef.current = true; setDragging(true); setHint(false); }}
       onDragEnd={() => { draggingRef.current = false; setDragging(false); }}
-      animate={dragging ? undefined : pos}
-      transition={dragging ? undefined : {
-        duration: 1.0,
-        ease: [0.22, 1, 0.36, 1],
-      }}
       style={{
         position: "fixed",
         width: size,
@@ -140,6 +158,8 @@ function FloatingPhoto() {
         cursor: dragging ? "grabbing" : "grab",
         touchAction: "none",
         userSelect: "none",
+        scale: 0,
+        opacity: 0,
       }}
       whileDrag={{ scale: 1.08 }}
     >
@@ -163,20 +183,11 @@ function FloatingPhoto() {
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
           style={{
-            position: "absolute",
-            bottom: -26,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "rgba(232,201,109,0.15)",
-            border: "1px solid rgba(232,201,109,0.4)",
-            borderRadius: 20,
-            padding: "2px 10px",
-            fontSize: 10,
-            color: "#e8c96d",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
+            position: "absolute", bottom: -26, left: "50%", transform: "translateX(-50%)",
+            background: "rgba(232,201,109,0.15)", border: "1px solid rgba(232,201,109,0.4)",
+            borderRadius: 20, padding: "2px 10px", fontSize: 10, color: "#e8c96d",
+            whiteSpace: "nowrap", pointerEvents: "none",
           }}
         >
           drag me ✦
@@ -187,8 +198,7 @@ function FloatingPhoto() {
         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
         style={{
           position: "absolute", inset: -6, borderRadius: "50%",
-          border: "1.5px dashed rgba(232,201,109,0.3)",
-          pointerEvents: "none",
+          border: "1.5px dashed rgba(232,201,109,0.3)", pointerEvents: "none",
         }}
       />
     </motion.div>
@@ -824,7 +834,7 @@ export default function App() {
           </motion.div>
 
           {/* photo */}
-          <div style={{ display: "flex", justifyContent: "center", order: isMobile ? 1 : 2, paddingTop: isMobile ? 20 : 0 }}>
+          <div id="hero-photo-anchor" style={{ display: "flex", justifyContent: "center", order: isMobile ? 1 : 2, paddingTop: isMobile ? 20 : 0 }}>
             <ProfileHero scrollY={springY} />
           </div>
         </div>
