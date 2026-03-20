@@ -1,0 +1,9 @@
+{
+  "outputDirectory": "artifacts/media-buyer-cv/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
