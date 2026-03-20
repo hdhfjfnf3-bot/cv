@@ -6,7 +6,6 @@ import {
   useSpring,
   useInView,
   useDragControls,
-  useAnimate,
 } from "framer-motion";
 
 /* ══════════════════════════════════════════════════
@@ -28,138 +27,131 @@ function useIsMobile() {
 function FloatingPhoto() {
   const isMobile = useIsMobile();
   const size = isMobile ? 88 : 110;
-  const [scope, animate] = useAnimate();
+  const selfRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [dragging, setDragging] = useState(false);
   const [hint, setHint] = useState(false);
   const heroInViewRef = useRef(true);
-  const busyRef = useRef(false);
+  const timer1 = useRef<ReturnType<typeof setTimeout>>();
+  const timer2 = useRef<ReturnType<typeof setTimeout>>();
+  const scrollTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Single animate target — changed in steps to produce sequenced animations
+  const [anim, setAnim] = useState({ x: 0, y: 0, scale: 0 as number, opacity: 0 as number });
 
   const getHeroCenter = () => {
     const el = document.getElementById("hero-photo-anchor");
-    if (!el) return { x: window.innerWidth * 0.5 - size / 2, y: window.innerHeight * 0.4 - size / 2 };
+    if (!el) return { x: window.innerWidth * 0.5 - size / 2, y: window.innerHeight * 0.35 };
     const r = el.getBoundingClientRect();
-    return {
-      x: Math.round(r.left + r.width / 2 - size / 2),
-      y: Math.round(r.top + r.height / 2 - size / 2),
-    };
+    return { x: r.left + r.width / 2 - size / 2, y: r.top + r.height / 2 - size / 2 };
   };
 
   const findEmptySpot = () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const s = size;
-    const NAV_H = 62;
-    const COLS = isMobile ? 4 : 7;
-    const ROWS = 5;
-    const PAD = 8;
-    let bestScore = Infinity;
-    let bestX = w * 0.8;
-    let bestY = h * 0.5;
-    const el = scope.current as HTMLElement | null;
-
+    const w = window.innerWidth, h = window.innerHeight, s = size;
+    const NAV_H = 62, COLS = isMobile ? 4 : 7, ROWS = 5, PAD = 8;
+    let best = Infinity, bx = w * 0.8, by = h * 0.5;
+    const self = selfRef.current;
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const cx = PAD + col * (w - 2 * PAD - s) / Math.max(COLS - 1, 1) + s / 2;
         const cy = NAV_H + PAD + row * (h - NAV_H - 2 * PAD - s) / Math.max(ROWS - 1, 1) + s / 2;
-        const probes: [number, number][] = [
-          [cx, cy], [cx - s * 0.35, cy - s * 0.35],
-          [cx + s * 0.35, cy - s * 0.35], [cx - s * 0.35, cy + s * 0.35],
-          [cx + s * 0.35, cy + s * 0.35],
-        ];
         let score = 0;
-        for (const [px, py] of probes) {
+        for (const [px, py] of [[cx,cy],[cx-s*.35,cy-s*.35],[cx+s*.35,cy-s*.35],[cx-s*.35,cy+s*.35],[cx+s*.35,cy+s*.35]] as [number,number][]) {
           if (px < 0 || py < 0 || px > w || py > h) { score += 20; continue; }
           for (const e of document.elementsFromPoint(px, py)) {
-            if (el && (e === el || el.contains(e))) continue;
-            const tag = e.tagName;
-            if (tag === "BODY" || tag === "HTML") continue;
+            if (self && (e === self || self.contains(e))) continue;
+            if (e.tagName === "BODY" || e.tagName === "HTML") continue;
             if (getComputedStyle(e).position === "fixed") continue;
-            score += 1;
+            score++;
           }
         }
-        if (score < bestScore) { bestScore = score; bestX = cx - s / 2; bestY = cy - s / 2; }
+        if (score < best) { best = score; bx = cx - s / 2; by = cy - s / 2; }
       }
     }
-    return {
-      x: Math.max(PAD, Math.min(bestX, w - s - PAD)),
-      y: Math.max(NAV_H, Math.min(bestY, h - s - PAD)),
-    };
+    return { x: Math.max(PAD, Math.min(bx, w - s - PAD)), y: Math.max(NAV_H, Math.min(by, h - s - PAD)) };
   };
 
-  const runEmerge = async () => {
-    if (draggingRef.current || busyRef.current) return;
-    busyRef.current = true;
-    const hc = getHeroCenter();
-    await animate(scope.current, { x: hc.x, y: hc.y, scale: 0, opacity: 0 }, { duration: 0 });
-    await animate(scope.current, { scale: 1, opacity: 1 }, { duration: 0.45, ease: [0.22, 1, 0.36, 1] });
-    setHint(true);
-    setTimeout(() => setHint(false), 3000);
-    const spot = findEmptySpot();
-    await animate(scope.current, { x: spot.x, y: spot.y }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
-    busyRef.current = false;
-  };
-
-  const runReturn = async () => {
-    if (draggingRef.current || busyRef.current) return;
-    busyRef.current = true;
-    setHint(false);
-    const hc = getHeroCenter();
-    await animate(scope.current, { x: hc.x, y: hc.y }, { duration: 0.6, ease: [0.22, 1, 0.36, 1] });
-    await animate(scope.current, { scale: 0, opacity: 0 }, { duration: 0.3, ease: "easeIn" });
-    busyRef.current = false;
+  const clearTimers = () => {
+    clearTimeout(timer1.current); clearTimeout(timer2.current); clearTimeout(scrollTimer.current);
   };
 
   useEffect(() => {
     const anchor = document.getElementById("hero-photo-anchor");
     if (!anchor) return;
+
+    // Start parked at hero center, invisible
     const hc = getHeroCenter();
-    animate(scope.current, { x: hc.x, y: hc.y, scale: 0, opacity: 0 }, { duration: 0 });
+    setAnim({ x: hc.x, y: hc.y, scale: 0, opacity: 0 });
 
     const obs = new IntersectionObserver(([entry]) => {
       const inView = entry.isIntersecting;
       if (inView === heroInViewRef.current) return;
       heroInViewRef.current = inView;
-      if (inView) { runReturn(); } else { runEmerge(); }
-    }, { threshold: 0.15 });
+      clearTimers();
+
+      if (!inView) {
+        // Hero left screen → emerge from hero center, then fly to empty spot
+        const hc2 = getHeroCenter();
+        // Snap to hero center (invisible, so instant is fine)
+        setAnim({ x: hc2.x, y: hc2.y, scale: 0, opacity: 0 });
+        // Pop open at hero center
+        timer1.current = setTimeout(() => {
+          setAnim(p => ({ ...p, scale: 1, opacity: 1 }));
+          setHint(true);
+          setTimeout(() => setHint(false), 3000);
+        }, 60);
+        // Glide to empty spot
+        timer2.current = setTimeout(() => {
+          const spot = findEmptySpot();
+          setAnim(p => ({ ...p, x: spot.x, y: spot.y }));
+        }, 560);
+      } else {
+        // Hero back in screen → glide back to hero center, then shrink into it
+        if (draggingRef.current) return;
+        setHint(false);
+        const hc2 = getHeroCenter();
+        setAnim(p => ({ ...p, x: hc2.x, y: hc2.y }));
+        timer1.current = setTimeout(() => {
+          setAnim(p => ({ ...p, scale: 0, opacity: 0 }));
+        }, 750);
+      }
+    }, { threshold: 0.2 });
+
     obs.observe(anchor);
 
-    let scrollTimer: ReturnType<typeof setTimeout>;
     const onScroll = () => {
-      if (heroInViewRef.current || draggingRef.current || busyRef.current) return;
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(async () => {
+      if (heroInViewRef.current || draggingRef.current) return;
+      clearTimeout(scrollTimer.current);
+      scrollTimer.current = setTimeout(() => {
         const spot = findEmptySpot();
-        await animate(scope.current, { x: spot.x, y: spot.y }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
-      }, 400);
+        setAnim(p => ({ ...p, x: spot.x, y: spot.y }));
+      }, 420);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    return () => {
-      obs.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      clearTimeout(scrollTimer);
-    };
+    return () => { obs.disconnect(); window.removeEventListener("scroll", onScroll); clearTimers(); };
   }, [isMobile]);
 
   return (
     <motion.div
-      ref={scope}
+      ref={selfRef}
       drag
       dragMomentum={false}
       dragElastic={0.12}
       onDragStart={() => { draggingRef.current = true; setDragging(true); setHint(false); }}
       onDragEnd={() => { draggingRef.current = false; setDragging(false); }}
+      animate={dragging ? undefined : anim}
+      transition={dragging ? undefined : {
+        x: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
+        y: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
+        scale: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] },
+        opacity: { duration: 0.35 },
+      }}
+      initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
       style={{
-        position: "fixed",
-        width: size,
-        height: size,
-        zIndex: 55,
+        position: "fixed", width: size, height: size, zIndex: 55,
         cursor: dragging ? "grabbing" : "grab",
-        touchAction: "none",
-        userSelect: "none",
-        scale: 0,
-        opacity: 0,
+        touchAction: "none", userSelect: "none",
       }}
       whileDrag={{ scale: 1.08 }}
     >
@@ -169,38 +161,25 @@ function FloatingPhoto() {
         boxShadow: dragging
           ? "0 0 28px 6px rgba(232,201,109,0.55), 0 0 60px rgba(124,58,237,0.4)"
           : "0 0 18px 4px rgba(124,58,237,0.5), 0 4px 24px rgba(0,0,0,0.5)",
-        background: "#1a0f2e",
-        transition: "box-shadow 0.3s",
+        background: "#1a0f2e", transition: "box-shadow 0.3s",
       }}>
-        <img
-          src="/profile.png"
-          alt="Profile"
-          draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
-        />
+        <img src="/profile.png" alt="Profile" draggable={false}
+          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
       </div>
       {hint && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
           style={{
             position: "absolute", bottom: -26, left: "50%", transform: "translateX(-50%)",
             background: "rgba(232,201,109,0.15)", border: "1px solid rgba(232,201,109,0.4)",
             borderRadius: 20, padding: "2px 10px", fontSize: 10, color: "#e8c96d",
             whiteSpace: "nowrap", pointerEvents: "none",
-          }}
-        >
+          }}>
           drag me ✦
         </motion.div>
       )}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        style={{
-          position: "absolute", inset: -6, borderRadius: "50%",
-          border: "1.5px dashed rgba(232,201,109,0.3)", pointerEvents: "none",
-        }}
-      />
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        style={{ position: "absolute", inset: -6, borderRadius: "50%",
+          border: "1.5px dashed rgba(232,201,109,0.3)", pointerEvents: "none" }} />
     </motion.div>
   );
 }
