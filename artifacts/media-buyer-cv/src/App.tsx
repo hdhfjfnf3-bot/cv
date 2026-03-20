@@ -570,7 +570,7 @@ function SidebarProfile() {
         <div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.3)", letterSpacing: "0.07em" }}>Performance Marketing</div>
       </div>
       <div style={{ width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(232,201,109,0.18), transparent)" }} />
-      {[{ icon: "??", label: "Location", val: "Cairo, Al-Maadi" }, { icon: "??", label: "Birthday", val: "28 Aug 2003" }, { icon: "??", label: "Work Type", val: "Freelancer" }].map((item) => (
+      {[{ icon: "📍", label: "Location", val: "Cairo, Al-Maadi" }, { icon: "🎂", label: "Birthday", val: "28 Aug 2003" }, { icon: "💼", label: "Work Type", val: "Freelancer" }].map((item) => (
         <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 9, padding: "7px 11px", width: "100%", borderRadius: 10, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <span style={{ fontSize: "0.85rem" }}>{item.icon}</span>
           <div>
@@ -810,7 +810,7 @@ export default function App() {
           <section>
             <SectionHeader num="04" title="Services" sub="What I can do for your business" />
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14 }}>
-              {[{ emoji: "??", title: "Campaign Management", desc: "Full management of your ad campaigns on Meta, TikTok & Snapchat with maximum efficiency.", accent: "#7c3aed" },{ emoji: "??", title: "Data Analysis & Reports", desc: "Daily, weekly and monthly reports with clear insights and actionable recommendations.", accent: "#e8c96d" },{ emoji: "??", title: "Campaign Scaling", desc: "Growing winning campaigns gradually while protecting your ROAS and performance targets.", accent: "#f43f5e" },{ emoji: "??", title: "A/B Testing", desc: "Systematic testing of Creatives, Audiences & Offers to find the best-performing combo.", accent: "#06b6d4" },{ emoji: "??", title: "Tracking Setup", desc: "Accurate Pixel & tracking configuration to ensure clean data and confident decisions.", accent: "#7c3aed" },{ emoji: "??", title: "Marketing Consulting", desc: "Full ad strategy tailored to your product type and target audience.", accent: "#e8c96d" }].map((s, i) => (
+              {[{ emoji: "🎯", title: "Campaign Management", desc: "Full management of your ad campaigns on Meta, TikTok & Snapchat with maximum efficiency.", accent: "#7c3aed" },{ emoji: "📊", title: "Data Analysis & Reports", desc: "Daily, weekly and monthly reports with clear insights and actionable recommendations.", accent: "#e8c96d" },{ emoji: "📈", title: "Campaign Scaling", desc: "Growing winning campaigns gradually while protecting your ROAS and performance targets.", accent: "#f43f5e" },{ emoji: "🧪", title: "A/B Testing", desc: "Systematic testing of Creatives, Audiences & Offers to find the best-performing combo.", accent: "#06b6d4" },{ emoji: "⚙️", title: "Tracking Setup", desc: "Accurate Pixel & tracking configuration to ensure clean data and confident decisions.", accent: "#7c3aed" },{ emoji: "💡", title: "Marketing Consulting", desc: "Full ad strategy tailored to your product type and target audience.", accent: "#e8c96d" }].map((s, i) => (
                 <Reveal key={s.title} delay={i * 0.07}>
                   <TiltCard className="glass" style={{ padding: 22, height: "100%", cursor: "default" }}>
                     <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -845,8 +845,8 @@ export default function App() {
                   {!isMobile && (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ position: "relative", width: 160, height: 160 }}>
-                        <div style={{ position: "absolute", inset: "50%", transform: "translate(-50%,-50%)", width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#e8c96d)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", boxShadow: "0 0 36px rgba(124,58,237,0.6)" }}>??</div>
-                        {["??","??","??","??"].map((icon, i) => (
+                        <div style={{ position: "absolute", inset: "50%", transform: "translate(-50%,-50%)", width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#e8c96d)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", boxShadow: "0 0 36px rgba(124,58,237,0.6)" }}>✨</div>
+                        {["📱","💰","🛒","🚀"].map((icon, i) => (
                           <motion.div key={i} style={{ position: "absolute", top: "50%", left: "50%", width: 34, height: 34, marginTop: -17, marginLeft: -17, borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem" }}
                             animate={{ x: Math.cos(i * Math.PI / 2) * 72, y: Math.sin(i * Math.PI / 2) * 72, rotate: [0, 360] }}
                             transition={{ x: { duration: 8, repeat: Infinity, ease: "linear" }, y: { duration: 8, repeat: Infinity, ease: "linear" }, rotate: { duration: 8, repeat: Infinity, ease: "linear" } }}>{icon}</motion.div>
@@ -864,7 +864,7 @@ export default function App() {
             <SectionHeader num="06" title="Contact" sub="Ready to start whenever you are" />
             <Reveal>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: 16 }}>
-                {[{ icon: "??", label: "WhatsApp", val: "Chat Now", color: "#25D366", href: "https://wa.me/201234567890" },{ icon: "??", label: "Email", val: "apdelrahman3rt@gmail.com", color: "#e8c96d", href: "mailto:apdelrahman3rt@gmail.com" },{ icon: "??", label: "Telegram", val: "@mediabuyerpro", color: "#2AABEE", href: "https://t.me/mediabuyerpro" }].map((c, i) => (
+                {[{ icon: "💬", label: "WhatsApp", val: "Chat Now", color: "#25D366", href: "https://wa.me/201234567890" },{ icon: "📧", label: "Email", val: "apdelrahman3rt@gmail.com", color: "#e8c96d", href: "mailto:apdelrahman3rt@gmail.com" },{ icon: "✈️", label: "Telegram", val: "@mediabuyerpro", color: "#2AABEE", href: "https://t.me/mediabuyerpro" }].map((c, i) => (
                   <motion.a key={i} href={c.href} target="_blank" rel="noopener noreferrer" className="glass"
                     style={{ padding: 22, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textDecoration: "none", borderRadius: 16, cursor: "pointer" }}
                     whileHover={{ scale: 1.04, boxShadow: `0 0 28px ${c.color}28` }} whileTap={{ scale: 0.97 }}
@@ -883,7 +883,7 @@ export default function App() {
                   <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.86rem", marginBottom: 26 }}>Let me turn your ad spend into real, measurable revenue</p>
                   <motion.a href="https://wa.me/201234567890" target="_blank" rel="noopener noreferrer" className="glow-btn"
                     style={{ display: "inline-block", padding: isMobile ? "13px 36px" : "16px 52px", borderRadius: 14, fontSize: "0.95rem", textDecoration: "none" }}
-                    whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}>Start Now ??</motion.a>
+                    whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}>Start Now 🚀</motion.a>
                 </div>
               </motion.div>
             </Reveal>
