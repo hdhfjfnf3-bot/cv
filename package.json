@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "pnpm -C artifacts/media-buyer-cv run dev",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build && node -e \"fs.cpSync('artifacts/media-buyer-cv/dist', 'public', {recursive:true})\"",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build && node -e \"fs.cpSync('artifacts/media-buyer-cv/dist/public', 'public', {recursive:true})\"",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
