@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Media Buyer CV"
+version = "1.0.0"
+id = "artifacts/media-buyer-cv"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23893
+
+[services.development]
+run = "pnpm --filter @workspace/media-buyer-cv run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/media-buyer-cv", "run", "build" ]
+publicDir = "artifacts/media-buyer-cv/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23893"
+BASE_PATH = "/"
