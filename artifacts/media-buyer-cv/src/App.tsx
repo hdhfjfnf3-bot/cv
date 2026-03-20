@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
@@ -29,48 +29,108 @@ function FloatingPhoto() {
   const size = isMobile ? 88 : 110;
   const [dragging, setDragging] = useState(false);
   const [hint, setHint] = useState(true);
+  const selfRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+
+  const initPos = () => ({
+    x: window.innerWidth * (isMobile ? 0.68 : 0.82) - size / 2,
+    y: Math.max(70, window.innerHeight * 0.15),
+  });
+
+  const [pos, setPos] = useState(initPos);
 
   useEffect(() => {
     const t = setTimeout(() => setHint(false), 3000);
     return () => clearTimeout(t);
   }, []);
 
-  const buildPath = () => {
+  const findEmptySpot = () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const s = size;
-    const clampX = (v: number) => Math.max(4, Math.min(v, w - s - 4));
-    const clampY = (v: number) => Math.max(64, Math.min(v, h - s - 10));
+    const NAV_H = 60;
+    const COLS = isMobile ? 4 : 7;
+    const ROWS = 5;
+    const PAD = 8;
 
-    if (isMobile) {
-      return {
-        x: [0.68, 0.04, 0.70, 0.02, 0.65, 0.06, 0.72, 0.68].map(r => clampX(w * r)),
-        y: [0.14, 0.22, 0.72, 0.55, 0.82, 0.40, 0.50, 0.14].map(r => clampY(h * r)),
-      };
+    let bestScore = Infinity;
+    let bestX = w * 0.8;
+    let bestY = h * 0.5;
+
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const cx = PAD + col * (w - 2 * PAD - s) / Math.max(COLS - 1, 1) + s / 2;
+        const cy = NAV_H + PAD + row * (h - NAV_H - 2 * PAD - s) / Math.max(ROWS - 1, 1) + s / 2;
+
+        const probes: [number, number][] = [
+          [cx, cy], [cx - s * 0.35, cy - s * 0.35],
+          [cx + s * 0.35, cy - s * 0.35], [cx - s * 0.35, cy + s * 0.35],
+          [cx + s * 0.35, cy + s * 0.35],
+        ];
+
+        let score = 0;
+        for (const [px, py] of probes) {
+          if (px < 0 || py < 0 || px > w || py > h) { score += 20; continue; }
+          const els = document.elementsFromPoint(px, py);
+          for (const el of els) {
+            if (el === selfRef.current || selfRef.current?.contains(el)) continue;
+            const tag = el.tagName;
+            const pos2 = getComputedStyle(el).position;
+            if (tag === "BODY" || tag === "HTML" || pos2 === "fixed") continue;
+            score += 1;
+          }
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestX = cx - s / 2;
+          bestY = cy - s / 2;
+        }
+      }
     }
+
     return {
-      x: [0.80, 0.06, 0.82, 0.07, 0.76, 0.05, 0.84, 0.80].map(r => clampX(w * r)),
-      y: [0.14, 0.16, 0.68, 0.72, 0.82, 0.50, 0.40, 0.14].map(r => clampY(h * r)),
+      x: Math.max(PAD, Math.min(bestX, w - s - PAD)),
+      y: Math.max(NAV_H, Math.min(bestY, h - s - PAD)),
     };
   };
 
-  const p = buildPath();
-  const DURATION = 16;
-  const TIMES = [0, 0.14, 0.28, 0.43, 0.57, 0.71, 0.86, 1];
+  useEffect(() => {
+    const move = () => {
+      if (draggingRef.current) return;
+      const spot = findEmptySpot();
+      setPos(spot);
+    };
+
+    move();
+
+    let timer: ReturnType<typeof setTimeout>;
+    const onScroll = () => {
+      clearTimeout(timer);
+      timer = setTimeout(move, 350);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", move);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", move);
+      clearTimeout(timer);
+    };
+  }, [isMobile, size]);
 
   return (
     <motion.div
+      ref={selfRef as React.RefObject<HTMLDivElement>}
       drag
       dragMomentum={false}
       dragElastic={0.12}
-      onDragStart={() => { setDragging(true); setHint(false); }}
-      onDragEnd={() => setDragging(false)}
-      animate={dragging ? {} : { x: p.x, y: p.y }}
-      transition={dragging ? {} : {
-        duration: DURATION,
-        repeat: Infinity,
-        ease: "easeInOut",
-        times: TIMES,
+      onDragStart={() => { draggingRef.current = true; setDragging(true); setHint(false); }}
+      onDragEnd={() => { draggingRef.current = false; setDragging(false); }}
+      animate={dragging ? undefined : pos}
+      transition={dragging ? undefined : {
+        duration: 1.0,
+        ease: [0.22, 1, 0.36, 1],
       }}
       style={{
         position: "fixed",
