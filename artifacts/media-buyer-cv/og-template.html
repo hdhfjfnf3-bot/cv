@@ -103,22 +103,32 @@
 
   /* Right Side: Profile Photo Frame */
   .photo-frame {
-    width: 380px;
-    height: 460px;
-    border-radius: 60% 40% 50% 50% / 50% 50% 60% 40%;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
     position: relative;
-    border: 4px solid rgba(232,201,109,0.8);
-    box-shadow: 0 0 60px rgba(124,58,237,0.6), 0 0 120px rgba(232,201,109,0.2);
+    border: 6px solid rgba(232,201,109,0.9);
+    box-shadow: 0 0 60px rgba(124,58,237,0.7), 0 0 120px rgba(232,201,109,0.3);
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0d091a;
   }
   .photo-frame img {
-    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    object-position: center;
   }
   .photo-halo {
-    position: absolute; right: 45px; top: 50px;
-    width: 440px; height: 520px;
-    border-radius: 50% 60% 40% 60% / 60% 40% 60% 40%;
-    border: 3px solid rgba(124,58,237,0.5);
+    position: absolute; 
+    right: 48px; 
+    top: 50px;
+    width: 450px; 
+    height: 450px;
+    border-radius: 50%;
+    border: 3px solid rgba(124,58,237,0.6);
   }
 </style>
 </head>
