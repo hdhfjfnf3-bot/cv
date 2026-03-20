@@ -26,47 +26,51 @@ function useIsMobile() {
 ══════════════════════════════════════════════════ */
 function FloatingPhoto() {
   const isMobile = useIsMobile();
-  const size = isMobile ? 90 : 115;
+  const size = isMobile ? 88 : 110;
   const [dragging, setDragging] = useState(false);
   const [hint, setHint] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setHint(false), 3500);
+    const t = setTimeout(() => setHint(false), 3000);
     return () => clearTimeout(t);
   }, []);
 
-  const vw = () => window.innerWidth;
-  const vh = () => window.innerHeight;
+  const buildPath = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const s = size;
+    const clampX = (v: number) => Math.max(4, Math.min(v, w - s - 4));
+    const clampY = (v: number) => Math.max(64, Math.min(v, h - s - 10));
 
-  const path = () => {
-    const w = vw(); const h = vh(); const s = size;
+    if (isMobile) {
+      return {
+        x: [0.68, 0.04, 0.70, 0.02, 0.65, 0.06, 0.72, 0.68].map(r => clampX(w * r)),
+        y: [0.14, 0.22, 0.72, 0.55, 0.82, 0.40, 0.50, 0.14].map(r => clampY(h * r)),
+      };
+    }
     return {
-      x: [
-        w * 0.72, w * 0.05, w * 0.45, w * 0.78,
-        w * 0.03, w * 0.55, w * 0.80, w * 0.72,
-      ].map(v => Math.max(4, Math.min(v, w - s - 4))),
-      y: [
-        h * 0.28, h * 0.55, h * 0.75, h * 0.80,
-        h * 0.18, h * 0.42, h * 0.62, h * 0.28,
-      ].map(v => Math.max(64, Math.min(v, h - s - 12))),
+      x: [0.80, 0.06, 0.82, 0.07, 0.76, 0.05, 0.84, 0.80].map(r => clampX(w * r)),
+      y: [0.14, 0.16, 0.68, 0.72, 0.82, 0.50, 0.40, 0.14].map(r => clampY(h * r)),
     };
   };
 
-  const p = path();
+  const p = buildPath();
+  const DURATION = 16;
+  const TIMES = [0, 0.14, 0.28, 0.43, 0.57, 0.71, 0.86, 1];
 
   return (
     <motion.div
       drag
       dragMomentum={false}
-      dragElastic={0.15}
+      dragElastic={0.12}
       onDragStart={() => { setDragging(true); setHint(false); }}
       onDragEnd={() => setDragging(false)}
       animate={dragging ? {} : { x: p.x, y: p.y }}
       transition={dragging ? {} : {
-        duration: 44,
+        duration: DURATION,
         repeat: Infinity,
         ease: "easeInOut",
-        times: [0, 0.14, 0.28, 0.42, 0.56, 0.70, 0.85, 1],
+        times: TIMES,
       }}
       style={{
         position: "fixed",
