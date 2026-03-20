@@ -713,15 +713,16 @@ export default function App() {
 
       <div style={{ position: "relative", zIndex: 1 }}><Marquee /></div>
 
-      {/* STATS */}
-      <section style={{ padding: isMobile ? "50px 20px" : "70px 6%", position: "relative", zIndex: 1 }}>
+      {/* SELECTED RESULTS (STATS) */}
+      <section style={{ padding: isMobile ? "50px 20px" : "60px 6%", position: "relative", zIndex: 1 }}>
         <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+          <SectionHeader num="01" title="Selected Results" sub="Proven track record across projects" />
           <Reveal>
             <div className="glass-dark" style={{ padding: isMobile ? "28px 20px" : "44px 40px", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: isMobile ? 28 : 32 }}>
-              <Counter to={12} suffix="+" label="Months of Experience" />
-              <Counter to={50} suffix="+" label="Successful Campaigns" />
-              <Counter to={3} label="Ad Platforms" />
-              <Counter to={95} suffix="%" label="Client Satisfaction" />
+              <Counter to={2} suffix="M+" label="Revenue Generated ($)" />
+              <Counter to={6} suffix="-Fig" label="Ad Budgets Managed" />
+              <Counter to={8} suffix="x" label="Peak ROAS Achieved" />
+              <Counter to={60} suffix="%" label="CPA Reduction" />
             </div>
           </Reveal>
         </div>
@@ -826,9 +827,85 @@ export default function App() {
             </div>
           </section>
 
+          {/* ADVANCED PERFORMANCE PROJECTS */}
+          <section>
+            <SectionHeader num="05" title="Advanced Systems" sub="The technical edge behind the results" />
+            <Reveal>
+              <div className="glass-purple gradient-border" style={{ padding: isMobile ? 24 : 36, borderRadius: 20 }}>
+                {["Built and scaled full-funnel marketing systems across multiple industries", "Implemented Server-Side Tracking (CAPI) for ultimate data precision", "Created retargeting ecosystems marrying Ads, Content, and Offers", "Developed robust creative testing frameworks to constantly uncover Winners", "Simultaneously managed massive multi-platform deployments (Meta + Google + TikTok)"].map((adv, i) => (
+                  <motion.div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 16 }}
+                    initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 * i }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#a78bfa", fontSize: "0.6rem" }}>⚡</div>
+                    <div style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.85rem", lineHeight: 1.6 }}>{adv}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </Reveal>
+          </section>
+
+          {/* INDUSTRY EXPERTISE */}
+          <section>
+            <SectionHeader num="06" title="Industry Expertise" sub="Multi-niche domination and scaling case studies" />
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+              {[
+                { icon: "🍽", title: "Restaurants & Cafés", desc: "Managed 60+ brands. Scaled local campaigns achieving 150%–300% revenue growth. Launched Grand Opening promos generating full bookings in 48h.", accent: "#f43f5e" },
+                { icon: "🛍", title: "E-Commerce Scaling", desc: "Scaled stores from $0 to $250K+/mo. Handled $200K+ ad spend across Meta & TikTok maintaining consistent 4x to 7x ROAS.", accent: "#e8c96d" },
+                { icon: "👕", title: "Fashion Brands", desc: "Aggressively scaled from $10K to $120K/month in exactly 4 months. Reduced CPA by 45% utilizing heavy creative testing.", accent: "#7c3aed" },
+                { icon: "💄", title: "Beauty & Skincare", desc: "Generated $500K+ revenue. Innovated hybrid influencer and UGC ad strategies capturing market-leading CTRs.", accent: "#fbcfe8" },
+                { icon: "🏥", title: "Medical Clinics", desc: "Managed 30+ clinics delivering 10,000+ quality leads. Slashed CPL by 50% via advanced qualification funnels.", accent: "#4ade80" },
+                { icon: "🏢", title: "Real Estate", desc: "High-ticket generation. Built WhatsApp conversion funnels. Reduced CPL by 40% targeting ready-to-buy investors.", accent: "#facc15" },
+                { icon: "🏋️‍♂️", title: "Gyms & Fitness", desc: "Increased memberships by 200% in 3 months targeting local radii with high-converting seasonal transformation offers.", accent: "#f87171" },
+                { icon: "🎓", title: "Online Courses", desc: "Launched & scaled digital products. Built high-converting webinar funnels with remarkably low CAC.", accent: "#a78bfa" },
+                { icon: "🍔", title: "Food Delivery", desc: "Scaled daily orders by 180%. Capitalized on peak-hour performance utilizing extreme urgency and flash deals.", accent: "#fb923c" },
+                { icon: "🚗", title: "Local Services", desc: "Generated consistent daily inbound leads for Car Services, Education, and Maintenance businesses.", accent: "#60a5fa" }
+              ].map((ind, i) => (
+                <Reveal key={ind.title} delay={i * 0.04}>
+                  <TiltCard className="glass" style={{ padding: 22, height: "100%", borderTop: `1px solid ${ind.accent}44` }}>
+                    <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                      <div style={{ fontSize: "1.4rem", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 12, background: `${ind.accent}12`, border: `1px solid ${ind.accent}33`, flexShrink: 0, boxShadow: `0 0 15px ${ind.accent}15` }}>{ind.icon}</div>
+                      <div>
+                        <div style={{ fontWeight: 800, color: "#fff", fontSize: "0.9rem", marginBottom: 6 }}>{ind.title}</div>
+                        <div style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>{ind.desc}</div>
+                      </div>
+                    </div>
+                  </TiltCard>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+
+          {/* GLOBAL CERTIFICATIONS */}
+          <section style={{ overflow: "hidden", margin: "20px -20px 0", padding: "0 20px" }}>
+            <SectionHeader num="07" title="Certifications" sub="Global professional accreditations" />
+            <Reveal>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+                {[
+                  "Meta Certified Media Buying Professional",
+                  "Meta Certified Marketing Science Professional",
+                  "Google Ads Certification",
+                  "Google Analytics 4 Advanced",
+                  "TikTok Ads Expert Certification",
+                  "Snapchat Ads Advanced",
+                  "Growth Marketing – Reforge",
+                  "CRO Program – CXL",
+                  "Digital Marketing – Udacity",
+                  "Performance Marketing – Coursera",
+                  "Inbound Marketing – HubSpot",
+                  "Attribution Modeling – CXL",
+                ].map((cert, i) => (
+                  <motion.div key={i} className="glass" style={{ padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", gap: 10, border: "1px solid rgba(232,201,109,0.15)" }}
+                    whileHover={{ scale: 1.05, borderColor: "rgba(232,201,109,0.5)", background: "rgba(232,201,109,0.05)" }}>
+                    <span style={{ color: "#e8c96d" }}>🏅</span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>{cert}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </Reveal>
+          </section>
+
           {/* WHY ME */}
           <section>
-            <SectionHeader num="05" title="Why Me?" sub="What sets me apart from the rest" />
+            <SectionHeader num="08" title="Why Me?" sub="What sets me apart from the rest" />
             <Reveal>
               <div className="glass-dark gradient-border" style={{ padding: isMobile ? 26 : 38, borderRadius: 20, position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", right: -50, top: -50, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.14), transparent)", pointerEvents: "none" }} />
@@ -861,7 +938,7 @@ export default function App() {
 
           {/* CONTACT */}
           <section id="contact">
-            <SectionHeader num="06" title="Contact" sub="Ready to start whenever you are" />
+            <SectionHeader num="09" title="Contact" sub="Ready to start whenever you are" />
             <Reveal>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: 16 }}>
                 {[{ icon: "💬", label: "WhatsApp", val: "Chat Now", color: "#25D366", href: "https://wa.me/201234567890" },{ icon: "📧", label: "Email", val: "apdelrahman3rt@gmail.com", color: "#e8c96d", href: "mailto:apdelrahman3rt@gmail.com" },{ icon: "✈️", label: "Telegram", val: "@mediabuyerpro", color: "#2AABEE", href: "https://t.me/mediabuyerpro" }].map((c, i) => (
