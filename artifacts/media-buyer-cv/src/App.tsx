@@ -289,41 +289,58 @@ function Particles() {
     const c = ref.current!;
     const ctx = c.getContext("2d")!;
     let id: number;
-    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
-    resize();
+    let w = c.width = window.innerWidth;
+    let h = c.height = window.innerHeight;
+    
+    // Fewer particles on mobile for performance
+    const count = w < 768 ? 20 : 45;
+    
+    const resize = () => { w = c.width = window.innerWidth; h = c.height = window.innerHeight; };
     window.addEventListener("resize", resize);
-    const pts = Array.from({ length: 50 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
+    
+    const pts = Array.from({ length: count }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
       vx: (Math.random() - 0.5) * 0.35,
       vy: (Math.random() - 0.5) * 0.35,
       r: Math.random() * 1.4 + 0.4,
       hue: Math.random() > 0.5 ? 45 : 270,
     }));
+    
     const tick = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
-      pts.forEach((p) => {
-        p.x = (p.x + p.vx + c.width) % c.width;
-        p.y = (p.y + p.vy + c.height) % c.height;
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < count; i++) {
+        const p = pts[i];
+        p.x = (p.x + p.vx + w) % w;
+        p.y = (p.y + p.vy + h) % h;
+        
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${p.hue},80%,70%,0.4)`;
         ctx.fill();
-      });
-      pts.forEach((a, i) => pts.slice(i + 1).forEach((b) => {
-        const d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (d < 110) {
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(232,201,109,${0.07 * (1 - d / 110)})`;
-          ctx.lineWidth = 0.5;
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
+        
+        // Lines
+        for (let j = i + 1; j < count; j++) {
+          const b = pts[j];
+          const dx = p.x - b.x;
+          if (dx > 110 || dx < -110) continue;
+          const dy = p.y - b.y;
+          if (dy > 110 || dy < -110) continue;
+          
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 110) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(232,201,109,${0.07 * (1 - d / 110)})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
         }
-      }));
+      }
       id = requestAnimationFrame(tick);
     };
-    tick();
+    id = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(id); window.removeEventListener("resize", resize); };
   }, []);
   return <canvas ref={ref} style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }} />;

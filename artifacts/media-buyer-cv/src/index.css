@@ -61,35 +61,34 @@
 .aurora-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.2;
+  opacity: 0.25;
   animation: auroraFloat 10s ease-in-out infinite;
   will-change: transform;
 }
 
 .aurora-orb-1 {
   width: 700px; height: 700px;
-  background: radial-gradient(circle, #6d28d9, #4c1d95, transparent);
+  background: radial-gradient(circle at center, #6d28d9 0%, #4c1d95 30%, transparent 70%);
   top: -250px; left: -120px;
   animation-duration: 11s;
 }
 .aurora-orb-2 {
   width: 600px; height: 600px;
-  background: radial-gradient(circle, #e8c96d, #b8952d, transparent);
+  background: radial-gradient(circle at center, #e8c96d 0%, #b8952d 30%, transparent 70%);
   top: 25%; right: -180px;
   animation-duration: 14s;
   animation-delay: -4s;
 }
 .aurora-orb-3 {
   width: 500px; height: 500px;
-  background: radial-gradient(circle, #f43f5e, #be123c, transparent);
+  background: radial-gradient(circle at center, #f43f5e 0%, #be123c 30%, transparent 70%);
   bottom: -80px; left: 28%;
   animation-duration: 10s;
   animation-delay: -7s;
 }
 .aurora-orb-4 {
   width: 400px; height: 400px;
-  background: radial-gradient(circle, #06b6d4, #0891b2, transparent);
+  background: radial-gradient(circle at center, #06b6d4 0%, #0891b2 30%, transparent 70%);
   top: 55%; left: -80px;
   animation-duration: 13s;
   animation-delay: -2s;
@@ -97,11 +96,11 @@
 /* extra premium orb */
 .aurora-orb-5 {
   width: 350px; height: 350px;
-  background: radial-gradient(circle, #8b5cf6, transparent);
+  background: radial-gradient(circle at center, #8b5cf6 0%, transparent 70%);
   top: 40%; right: 25%;
   animation-duration: 17s;
   animation-delay: -6s;
-  opacity: 0.12;
+  opacity: 0.15;
 }
 
 @keyframes auroraFloat {
