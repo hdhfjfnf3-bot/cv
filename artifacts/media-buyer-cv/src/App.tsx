@@ -941,7 +941,7 @@ export default function App() {
             <SectionHeader num="09" title="Contact" sub="Ready to start whenever you are" />
             <Reveal>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: 16 }}>
-                {[{ icon: "💬", label: "WhatsApp", val: "Chat Now", color: "#25D366", href: "https://wa.me/201234567890" },{ icon: "📧", label: "Email", val: "apdelrahman3rt@gmail.com", color: "#e8c96d", href: "mailto:apdelrahman3rt@gmail.com" },{ icon: "✈️", label: "Telegram", val: "@mediabuyerpro", color: "#2AABEE", href: "https://t.me/mediabuyerpro" }].map((c, i) => (
+                {[{ icon: "💬", label: "WhatsApp", val: "Chat Now", color: "#25D366", href: "https://wa.me/201080172165" },{ icon: "📧", label: "Email", val: "apdelrahman3rt@gmail.com", color: "#e8c96d", href: "mailto:apdelrahman3rt@gmail.com" },{ icon: "✈️", label: "Telegram", val: "@mediabuyerpro", color: "#2AABEE", href: "https://t.me/mediabuyerpro" }].map((c, i) => (
                   <motion.a key={i} href={c.href} target="_blank" rel="noopener noreferrer" className="glass"
                     style={{ padding: 22, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textDecoration: "none", borderRadius: 16, cursor: "pointer" }}
                     whileHover={{ scale: 1.04, boxShadow: `0 0 28px ${c.color}28` }} whileTap={{ scale: 0.97 }}
@@ -958,7 +958,7 @@ export default function App() {
                 <div style={{ position: "relative", zIndex: 1 }}>
                   <p style={{ fontSize: isMobile ? "1.2rem" : "1.5rem", fontWeight: 900, color: "#fff", marginBottom: 8 }}>Ready to scale your business?</p>
                   <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.86rem", marginBottom: 26 }}>Let me turn your ad spend into real, measurable revenue</p>
-                  <motion.a href="https://wa.me/201234567890" target="_blank" rel="noopener noreferrer" className="glow-btn"
+                  <motion.a href="https://wa.me/201080172165" target="_blank" rel="noopener noreferrer" className="glow-btn"
                     style={{ display: "inline-block", padding: isMobile ? "13px 36px" : "16px 52px", borderRadius: 14, fontSize: "0.95rem", textDecoration: "none" }}
                     whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}>Start Now 🚀</motion.a>
                 </div>
