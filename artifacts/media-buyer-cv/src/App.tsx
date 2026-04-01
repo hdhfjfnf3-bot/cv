@@ -5,7 +5,6 @@ import {
   useTransform,
   useSpring,
   useInView,
-  useDragControls,
 } from "framer-motion";
 
 /* ══════════════════════════════════════════════════
@@ -625,7 +624,7 @@ export default function App() {
   const heroOpacity = useTransform(scrollY, [0, 450], [1, 0]);
   const heroY = useTransform(springY, [0, 600], [0, isMobile ? -40 : -80]);
   const [navOpen, setNavOpen] = useState(false);
-  const NAV_LINKS = ["Skills", "Experience", "Platforms", "Contact"];
+  const NAV_LINKS = ["Skills", "Experience", "Platforms", "Courses", "Contact"];
 
   return (
     <div style={{ minHeight: "100vh", background: "#080612", position: "relative" }}>
@@ -639,7 +638,7 @@ export default function App() {
       <div className="grid-overlay" />
       <div className="noise-overlay" />
       <Particles />
-      <FloatingPhoto />
+
 
       {/* NAV */}
       <motion.nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "14px 20px" : "16px 48px", backdropFilter: "blur(18px)", background: navBg, borderBottom: "1px solid", borderColor: navBorder }}
@@ -874,33 +873,172 @@ export default function App() {
             </div>
           </section>
 
-          {/* GLOBAL CERTIFICATIONS */}
-          <section style={{ overflow: "hidden", margin: "20px -20px 0", padding: "0 20px" }}>
-            <SectionHeader num="07" title="Certifications" sub="Global professional accreditations" />
-            <Reveal>
-              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
-                {[
-                  "Meta Certified Media Buying Professional",
-                  "Meta Certified Marketing Science Professional",
-                  "Google Ads Certification",
-                  "Google Analytics 4 Advanced",
-                  "TikTok Ads Expert Certification",
-                  "Snapchat Ads Advanced",
-                  "Growth Marketing – Reforge",
-                  "CRO Program – CXL",
-                  "Digital Marketing – Udacity",
-                  "Performance Marketing – Coursera",
-                  "Inbound Marketing – HubSpot",
-                  "Attribution Modeling – CXL",
-                ].map((cert, i) => (
-                  <motion.div key={i} className="glass" style={{ padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", gap: 10, border: "1px solid rgba(232,201,109,0.15)" }}
-                    whileHover={{ scale: 1.05, borderColor: "rgba(232,201,109,0.5)", background: "rgba(232,201,109,0.05)" }}>
-                    <span style={{ color: "#e8c96d" }}>🏅</span>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>{cert}</span>
+          {/* COURSES */}
+          <section id="courses" style={{ overflow: "hidden" }}>
+            <SectionHeader num="07" title="Courses & Training" sub="My complete learning journey in digital marketing & media buying" />
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", gap: 16 }}>
+              {[
+                {
+                  title: "Digital Marketing",
+                  provider: "Udacity FWD",
+                  category: "Digital Marketing",
+                  accent: "#02b3e4",
+                  icon: "🎓",
+                  badge: "FWD",
+                  desc: "Comprehensive digital marketing nanodegree covering SEO, SEM, social media, content strategy, email marketing, and analytics."
+                },
+                {
+                  title: "Digital Marketing",
+                  provider: "Growth Hacking",
+                  category: "Growth Hacking",
+                  accent: "#f43f5e",
+                  icon: "🚀",
+                  badge: "GROWTH",
+                  desc: "Advanced growth hacking methodologies, viral loops, retention optimization, and product-led growth frameworks."
+                },
+                {
+                  title: "Marketing Analytics",
+                  provider: "م/ إيهاب شفيق",
+                  category: "Analytics",
+                  accent: "#e8c96d",
+                  icon: "📊",
+                  badge: "ANALYTICS",
+                  desc: "Deep dive into marketing analytics, data interpretation, campaign measurement and performance reporting."
+                },
+                {
+                  title: "Media Buying",
+                  provider: "Growth Hacking",
+                  category: "Media Buying",
+                  accent: "#f43f5e",
+                  icon: "💰",
+                  badge: "GROWTH",
+                  desc: "Core media buying fundamentals: audience research, bidding strategies, budget allocation, and campaign optimization."
+                },
+                {
+                  title: "Google Ads",
+                  provider: "Udemy",
+                  category: "Google Ads",
+                  accent: "#4285f4",
+                  icon: "🔍",
+                  badge: "UDEMY",
+                  desc: "Mastering Google Ads search, display, shopping, and video campaigns with advanced bidding and conversion tracking."
+                },
+                {
+                  title: "Snapchat Ads",
+                  provider: "م/ محمود سعيد",
+                  category: "Paid Social",
+                  accent: "#fffc00",
+                  icon: "👻",
+                  badge: "SNAP",
+                  desc: "Full Snapchat Ads ecosystem: Story ads, Collection ads, Dynamic ads, Snap Pixel and youth audience targeting strategies."
+                },
+                {
+                  title: "TikTok Ads",
+                  provider: "م/ محمود داوود",
+                  category: "Paid Social",
+                  accent: "#fe2c55",
+                  icon: "🎵",
+                  badge: "TIKTOK",
+                  desc: "TikTok in-feed ads, Spark Ads, TopView, creative testing frameworks and TikTok Pixel setup for e-commerce."
+                },
+                {
+                  title: "CRO",
+                  provider: "م/ محمد نعمة الله",
+                  category: "Conversion Rate Optimization",
+                  accent: "#06b6d4",
+                  icon: "⚡",
+                  badge: "CRO",
+                  desc: "Conversion Rate Optimization: landing page testing, A/B experiments, funnel analysis, and behavioral psychology for higher conversions."
+                },
+                {
+                  title: "Mind Shift Course",
+                  provider: "Media Buyer Mindset",
+                  category: "Strategy & Mindset",
+                  accent: "#a78bfa",
+                  icon: "🧠",
+                  badge: "MINDSET",
+                  desc: "Think like a pro media buyer: campaign strategy frameworks, decision-making under pressure, and creative problem-solving."
+                },
+                {
+                  title: "GA4",
+                  provider: "م/ إيهاب شفيق",
+                  category: "Analytics",
+                  accent: "#e8c96d",
+                  icon: "📈",
+                  badge: "ANALYTICS",
+                  desc: "Google Analytics 4 from setup to mastery: events, conversions, audiences, funnels, and cross-platform reporting."
+                },
+                {
+                  title: "GTM",
+                  provider: "م/ إبراهيم هنداوي",
+                  category: "Tracking & Tech",
+                  accent: "#4ade80",
+                  icon: "🏷️",
+                  badge: "TRACKING",
+                  desc: "Google Tag Manager mastery: implementing pixels, events, custom triggers, and server-side tracking for bulletproof data collection."
+                }
+              ].map((course, i) => (
+                <Reveal key={course.title + course.provider} delay={i * 0.06}>
+                  <motion.div
+                    className="glass"
+                    style={{
+                      padding: isMobile ? 20 : 26,
+                      height: "100%",
+                      borderRadius: 18,
+                      border: `1px solid ${course.accent}22`,
+                      borderTop: `2px solid ${course.accent}`,
+                      position: "relative",
+                      overflow: "hidden",
+                      cursor: "default",
+                    }}
+                    whileHover={{
+                      borderColor: course.accent + "55",
+                      boxShadow: `0 0 32px ${course.accent}18, 0 8px 32px rgba(0,0,0,0.4)`,
+                      y: -4,
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Background glow */}
+                    <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: `radial-gradient(circle, ${course.accent}18, transparent)`, pointerEvents: "none" }} />
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{
+                          width: 46, height: 46,
+                          borderRadius: 13,
+                          background: `${course.accent}18`,
+                          border: `1px solid ${course.accent}44`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "1.35rem",
+                          boxShadow: `0 0 16px ${course.accent}22`,
+                          flexShrink: 0,
+                        }}>{course.icon}</div>
+                        <div>
+                          <div style={{ fontWeight: 900, color: "#fff", fontSize: isMobile ? "0.92rem" : "1rem", lineHeight: 1.2, marginBottom: 3 }}>{course.title}</div>
+                          <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>{course.category}</div>
+                        </div>
+                      </div>
+                      <span style={{
+                        fontSize: "0.6rem", fontWeight: 800,
+                        padding: "4px 10px",
+                        borderRadius: 100,
+                        background: `${course.accent}18`,
+                        border: `1px solid ${course.accent}44`,
+                        color: course.accent === "#fffc00" ? "#b8b600" : course.accent,
+                        letterSpacing: "0.07em",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}>{course.badge}</span>
+                    </div>
+                    {/* Divider */}
+                    <div style={{ height: 1, background: `linear-gradient(90deg, ${course.accent}44, transparent)`, marginBottom: 12 }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+                      <span style={{ fontSize: "0.72rem", color: course.accent === "#fffc00" ? "#b8b600" : course.accent, fontWeight: 700 }}>🎯 {course.provider}</span>
+                    </div>
+                    <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.42)", lineHeight: 1.65, margin: 0 }}>{course.desc}</p>
                   </motion.div>
-                ))}
-              </div>
-            </Reveal>
+                </Reveal>
+              ))}
+            </div>
           </section>
 
           {/* WHY ME */}
